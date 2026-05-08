@@ -15,39 +15,58 @@ export const PeopleProvider: React.FC<Props> = ({ children }) => {
   const [hasError, setHasError] = useState(false);
 
   const linkRelatives = useCallback(
-    async (dict: PeopleDictionary, list: PersonSlug[]) => {
-      for (const personSlug of list) {
-        const person = dict[personSlug];
-        const motherName = person.motherName;
-        const fatherName = person.fatherName;
+    (dict: PeopleDictionary, list: PersonSlug[]) => {
+      // O(n)
+      const peopleByNames = new Map(
+        list.map(slug => [dict[slug].name, dict[slug]]),
+      );
+      // or "[map] nameToPerson"?
 
-        if (motherName !== null) {
-          for (const motherSlug of list) {
-            const potentialMother = dict[motherSlug];
+      list.forEach(slug => {
+        const person = dict[slug];
 
-            if (motherName === potentialMother.name) {
-              person.mother = potentialMother;
-              break;
-            }
-          }
+        if (person.motherName) {
+          person.mother = peopleByNames.get(person.motherName);
         }
 
-        if (fatherName !== null) {
-          for (const fatherSlug of list) {
-            const potentialFather = dict[fatherSlug];
-
-            if (fatherName === potentialFather.name) {
-              person.father = potentialFather;
-              break;
-            }
-          }
+        if (person.fatherName) {
+          person.father = peopleByNames.get(person.fatherName);
         }
-      }
+      });
+
+      // O(n^2)
+      // for (const personSlug of list) {
+      //   const person = dict[personSlug];
+      //   const motherName = person.motherName;
+      //   const fatherName = person.fatherName;
+
+      //   if (motherName !== null) {
+      //     for (const motherSlug of list) {
+      //       const potentialMother = dict[motherSlug];
+
+      //       if (motherName === potentialMother.name) {
+      //         person.mother = potentialMother;
+      //         break;
+      //       }
+      //     }
+      //   }
+
+      //   if (fatherName !== null) {
+      //     for (const fatherSlug of list) {
+      //       const potentialFather = dict[fatherSlug];
+
+      //       if (fatherName === potentialFather.name) {
+      //         person.father = potentialFather;
+      //         break;
+      //       }
+      //     }
+      //   }
+      // }
     },
     [],
   );
 
-  const fetchPeople = useCallback(async () => {
+  const fetchPeople = useCallback(() => {
     setIsLoading(true);
     setHasError(false);
 
@@ -59,6 +78,13 @@ export const PeopleProvider: React.FC<Props> = ({ children }) => {
 
         return result.json() as Promise<Person[]>;
       })
+      // .then(peeps => {
+      //   return new Promise(res => {
+      //     setTimeout(() => {
+      //       res([]);
+      //     }, 3000);
+      //   });
+      // })
       .then(fetchedPeople => {
         const fetchedPeopleDictionary: PeopleDictionary = {};
         const fetchedPeopleSlugList: PersonSlug[] = [];
