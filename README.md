@@ -26,3 +26,6 @@ Implement the `App` with 2 pages and ability to select a person in the table.
 - Use the [React TypeScript cheat sheet](https://mate-academy.github.io/fe-program/js/extra/react-typescript).
 - Open one more terminal and run tests with `npm test` to ensure your solution is correct.
 - Replace `<your_account>` with your Github username in the [DEMO LINK](https://sanchez-primal.github.io/react_people-table-basics/) and add it to the PR description.
+
+# GitHub tests retries
+1
